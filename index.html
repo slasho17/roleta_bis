@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191919">
+  <title>Roleta do Dia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <p class="eyebrow">Tarefas & recompensas</p>
+      <h1>Roleta do Dia</h1>
+      <p>Transforme sua lista em um jogo: ajuste as chances, gire e mãos à obra.</p>
+    </header>
+
+    <section class="wheel-panel card" aria-labelledby="wheel-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Sua próxima missão</p><h2 id="wheel-title">Gire a roleta</h2></div>
+        <div class="legend"><span><i class="task-dot"></i>Tarefa</span><span><i class="reward-dot"></i>Recompensa</span></div>
+      </div>
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="720" height="720" aria-label="Roleta com os itens disponíveis"></canvas>
+      </div>
+      <p id="wheel-empty" class="wheel-empty" hidden>Adicione itens com peso maior que zero para começar.</p>
+      <button id="spin" class="primary spin-button" type="button">Girar</button>
+      <p id="spin-rule" class="spin-rule" aria-live="polite"></p>
+      <div id="result" class="result" hidden aria-live="polite">
+        <p id="result-type" class="result-type"></p>
+        <strong id="result-text"></strong>
+        <div class="result-actions">
+          <button id="complete-result" class="primary" type="button">Concluir</button>
+          <button id="spin-again" class="secondary" type="button">Girar de novo</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="add-grid" aria-label="Adicionar itens">
+      <form id="task-form" class="card add-card task-card">
+        <label for="task-input"><span class="category-icon">✓</span> Adicionar tarefas</label>
+        <textarea id="task-input" rows="4" placeholder="Uma tarefa por linha&#10;- Lavar a louça&#10;- Fazer exercício"></textarea>
+        <button class="primary" type="submit">Adicionar tarefas</button>
+      </form>
+      <form id="reward-form" class="card add-card reward-card">
+        <label for="reward-input"><span class="category-icon">★</span> Adicionar recompensas</label>
+        <textarea id="reward-input" rows="4" placeholder="Uma recompensa por linha&#10;- Ver um episódio&#10;- Tomar um café"></textarea>
+        <button class="reward-button" type="submit">Adicionar recompensas</button>
+      </form>
+    </section>
+
+    <section class="items-section">
+      <div class="section-heading list-heading">
+        <div><p class="eyebrow">Controle as chances</p><h2>Itens do dia</h2></div>
+        <span id="item-count" class="count"></span>
+      </div>
+      <div class="list-grid">
+        <div class="card list-card">
+          <h3><i class="task-dot"></i>Tarefas <span id="task-count">0</span></h3>
+          <div id="task-list" class="item-list"></div>
+        </div>
+        <div class="card list-card">
+          <h3><i class="reward-dot"></i>Recompensas <span id="reward-count">0</span></h3>
+          <div id="reward-list" class="item-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

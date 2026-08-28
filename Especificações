@@ -1,0 +1,94 @@
+# Especificação — Roleta de Tarefas e Recompensas
+
+## 1. Visão Geral
+
+Aplicação web estática (client-side only), hospedada no GitHub Pages, sem backend/servidor. Serve para sortear, de forma gamificada, quais tarefas do dia a pessoa vai executar, misturando essas tarefas com "recompensas" em uma roleta giratória. Todos os dados são persistidos no **localStorage** do navegador (sem cookies, sem login, sem sincronização entre dispositivos).
+
+## 2. Stack Técnica
+
+- HTML + CSS + JavaScript puro (ou framework leve, a critério de quem for gerar o código), sem necessidade de build/servidor.
+- Compatível com GitHub Pages (arquivos estáticos).
+- Persistência via `localStorage`.
+- Responsivo o suficiente para uso em desktop e celular (não é o foco principal, mas não deve quebrar o layout).
+
+## 3. Modelo de Dados
+
+Cada item (tarefa ou recompensa) deve ter:
+
+```json
+{
+  "id": "uuid-ou-timestamp",
+  "texto": "Lavar a louça",
+  "tipo": "tarefa" | "recompensa",
+  "peso": 1,
+  "concluido": false,
+  "criadoEm": "2026-08-28T12:00:00Z"
+}
+```
+
+- `peso`: inteiro >= 0. Default = 1.
+- `concluido`: booleano, controla o risco (strikethrough) na lista.
+- A lista completa de itens (tarefas + recompensas) fica salva em uma única chave no localStorage (ex: `roleta_itens`), como array de objetos no formato acima.
+
+## 4. Funcionalidades
+
+### 4.1 Campo de Adicionar Tarefas / Recompensas
+
+- Dois campos de texto separados (textarea), um para **Tarefas** e outro para **Recompensas**.
+- Cada campo aceita múltiplas linhas de uma vez.
+- Ao processar o texto (botão "Adicionar" em cada campo):
+  1. Quebrar o texto por linha.
+  2. Ignorar linhas vazias (apenas espaço em branco).
+  3. Remover, do início de cada linha, caracteres de marcação comuns de lista: `-`, `*`, `•`, `–`, `—`, e variações com espaço logo depois (ex: `"- Lavar louça"` vira `"Lavar louça"`). Também remover marcadores numéricos tipo `"1."`, `"1)"` no início da linha, se fizer sentido incluir.
+  4. Cada linha restante vira um novo item na lista, com `peso = 1` e `concluido = false`, do `tipo` correspondente ao campo usado (tarefa ou recompensa).
+  5. Após adicionar, limpar o campo de texto.
+
+### 4.2 Lista de Itens do Dia
+
+- Lista visual mostrando todos os itens adicionados (tarefas e recompensas juntas, ou em seções separadas — a critério de quem implementar, mas precisa deixar claro visualmente qual é qual, ex: usando as mesmas cores da roleta).
+- Itens com `concluido = true` aparecem com texto riscado (strikethrough), mas continuam na lista.
+- Cada item tem um controle de peso ao lado do texto, no formato `[ - ] [ 1 ] [ + ]`:
+  - Botão `-`: decrementa o peso em 1, sem deixar ir abaixo de 0.
+  - Número central: mostra o peso atual (não editável diretamente, só pelos botões, salvo indicação em contrário).
+  - Botão `+`: incrementa o peso em 1 (sem limite máximo definido — se quiser um teto, definir depois).
+- Cada item deve poder ser marcado como concluído (ex: clicando no próprio texto, ou um checkbox/botão dedicado — a definir na implementação, mas precisa existir essa ação).
+- **Remover item**: cada item da lista deve ter um botão simples e direto para excluí-lo permanentemente (ex: um "×" ao lado do controle de peso). Ação imediata, sem modal de confirmação nem passos extras — um clique remove o item da lista (e, por consequência, da roleta) para sempre.
+
+### 4.3 Roleta
+
+- Mostra todos os itens com `peso > 0` e `concluido = false` (itens concluídos ou com peso 0 não entram na roleta, mas continuam na lista para eventual reativação).
+- Cada item ocupa uma fatia da roleta proporcional ao seu `peso` (peso maior = fatia maior = mais chance de ser sorteado).
+- Cores diferenciam tarefas de recompensas (ex: uma cor para tarefas, outra para recompensas — pode variar o tom dentro do mesmo grupo, mas a categoria deve ser visualmente clara).
+- **Distribuição das fatias**: como recompensas são mais escassas, elas não podem ficar todas agrupadas lado a lado na roleta. Regra: ao montar a ordem das fatias, distribuir as recompensas o mais uniformemente possível entre as tarefas, garantindo que duas recompensas nunca fiquem diretamente adjacentes (quando houver tarefas suficientes para isso). Sugestão de algoritmo: intercalar por proporção (ex: round-robin ponderado) em vez de simplesmente concatenar todas as tarefas e depois todas as recompensas.
+- Botão "Girar" aciona a animação de rotação e sorteia um item respeitando os pesos (probabilidade proporcional ao peso).
+
+### 4.4 Resultado do Sorteio
+
+Após girar a roleta e ela parar em um item, mostrar na tela:
+- O nome do item sorteado (deixando claro se é tarefa ou recompensa).
+- Dois botões de ação:
+  - **"Concluir"**: marca o item como `concluido = true` na lista (risca o item).
+  - **"Girar de novo"** (descartar resultado): não altera o item sorteado, apenas permite girar a roleta novamente, como se o resultado não tivesse acontecido.
+
+## 5. Regras de Negócio
+
+- Peso mínimo: 0 (nunca negativo).
+- Peso 0: item some da roleta, mas continua visível e editável na lista (pode ter o peso aumentado de novo a qualquer momento).
+- Item concluído: não entra mais na roleta, fica riscado na lista. Não é excluído automaticamente.
+- Exclusão definitiva de um item (botão "×") é imediata e sem confirmação — não é o mesmo que peso 0 ou concluído, e não pode ser desfeita.
+
+## 6. Assunções Abertas (revisar antes de implementar)
+
+Pontos que não foram 100% especificados e que quem for gerar o código deve assumir um comportamento razoável (ou perguntar antes de codar):
+
+1. **Reset diário**: não foi definido se a lista de tarefas deve reiniciar automaticamente a cada novo dia, ou se os itens ficam acumulando indefinidamente até serem excluídos manualmente. Sugestão: manter tudo persistente por padrão, e talvez adicionar um botão manual tipo "Limpar concluídos" ou "Novo dia" no futuro.
+2. **Teto máximo de peso**: não há limite superior definido para o botão `+`. Sugestão: não limitar, ou limitar a um valor alto (ex: 10) apenas por sanidade visual da fatia na roleta.
+3. **Onde marcar como concluído fora do fluxo de sorteio**: além do botão "Concluir" que aparece após girar a roleta, deve ser possível marcar/desmarcar um item como concluído diretamente na lista (ex: clicando nele), para os casos em que a pessoa completa algo sem ter sido sorteado.
+4. **Separação visual tarefas/recompensas na lista**: pode ser em duas listas separadas ou uma lista só com cores diferentes — livre para a implementação, desde que fique visualmente claro.
+
+## 7. Requisitos Não Funcionais
+
+- 100% estático, sem dependência de servidor/backend.
+- Deploy simples via GitHub Pages (apenas arquivos HTML/CSS/JS na branch/pasta de publicação).
+- Dados persistidos via `localStorage`, sobrevivendo a fechar/reabrir o navegador (mas não sincronizando entre dispositivos ou navegadores diferentes).
+- Interface simples e funcional, sem necessidade de design sofisticado, mas com cores claras para diferenciar tarefas de recompensas.
