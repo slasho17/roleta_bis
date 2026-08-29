@@ -111,18 +111,18 @@
     }
     wheelEntries.forEach((entry, index) => {
       const { item, start, end, center: angle } = entry;
-      const palette = item.tipo === 'tarefa' ? ['#7fbd5c', '#9fd67d', '#b9e49e'] : ['#db7600', '#ff9400', '#ffad3d'];
+      const palette = item.tipo === 'tarefa' ? ['#f28c00', '#ff9400', '#ffa31a'] : ['#96cc75', '#9fd67d', '#a9dc89'];
       ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath();
       ctx.fillStyle = palette[index % palette.length]; ctx.fill();
       ctx.strokeStyle = '#191919'; ctx.lineWidth = 5; ctx.stroke();
       const slice = end - start;
       if (slice > .06) {
         ctx.save(); ctx.translate(center, center); ctx.rotate(angle);
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#111';
         ctx.font = `700 ${slice < .18 ? 18 : slice < .32 ? 22 : 27}px system-ui`;
         const maxChars = slice < .18 ? 11 : slice < .32 ? 16 : 23;
         const label = item.texto.length > maxChars ? `${item.texto.slice(0, maxChars - 1)}…` : item.texto;
-        ctx.shadowColor = '#0008'; ctx.shadowBlur = 5; ctx.fillText(label, radius - 28, 0); ctx.restore();
+        ctx.shadowColor = '#fff6'; ctx.shadowBlur = 3; ctx.fillText(label, radius - 28, 0); ctx.restore();
       }
     });
     ctx.beginPath(); ctx.arc(center, center, 48, 0, TAU); ctx.fillStyle = '#ffffff'; ctx.fill();

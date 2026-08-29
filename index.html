@@ -45,19 +45,7 @@
       </div>
     </section>
 
-    <section class="add-grid" aria-label="Adicionar itens">
-      <form id="task-form" class="card add-card task-card">
-        <label for="task-input"><span class="category-icon">✓</span> Adicionar tarefas</label>
-        <textarea id="task-input" rows="4" placeholder="Uma tarefa por linha&#10;- Lavar a louça&#10;- Fazer exercício"></textarea>
-        <button class="primary" type="submit">Adicionar tarefas</button>
-      </form>
-      <form id="reward-form" class="card add-card reward-card">
-        <label for="reward-input"><span class="category-icon">★</span> Adicionar recompensas</label>
-        <textarea id="reward-input" rows="4" placeholder="Uma recompensa por linha&#10;- Ver um episódio&#10;- Tomar um café"></textarea>
-        <button class="reward-button" type="submit">Adicionar recompensas</button>
-      </form>
-    </section>
-
+    <div class="controls-scroll">
     <section class="items-section">
       <div class="section-heading list-heading">
         <div><p class="eyebrow">Controle as chances</p><h2>Itens do dia</h2></div>
@@ -74,6 +62,20 @@
         </div>
       </div>
     </section>
+
+    <section class="add-grid" aria-label="Adicionar itens">
+      <form id="task-form" class="card add-card task-card">
+        <label for="task-input"><span class="category-icon">✓</span> Adicionar tarefas</label>
+        <textarea id="task-input" rows="4" placeholder="Uma tarefa por linha&#10;- Lavar a louça&#10;- Fazer exercício"></textarea>
+        <button class="primary" type="submit">Adicionar tarefas</button>
+      </form>
+      <form id="reward-form" class="card add-card reward-card">
+        <label for="reward-input"><span class="category-icon">★</span> Adicionar recompensas</label>
+        <textarea id="reward-input" rows="4" placeholder="Uma recompensa por linha&#10;- Ver um episódio&#10;- Tomar um café"></textarea>
+        <button class="reward-button" type="submit">Adicionar recompensas</button>
+      </form>
+    </section>
+    </div>
   </main>
   <script src="app.js"></script>
 </body>
