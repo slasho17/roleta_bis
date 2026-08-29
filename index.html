@@ -27,6 +27,14 @@
       <p id="wheel-empty" class="wheel-empty" hidden>Adicione itens com peso maior que zero para começar.</p>
       <button id="spin" class="primary spin-button" type="button">Girar</button>
       <p id="spin-rule" class="spin-rule" aria-live="polite"></p>
+      <div class="streak-setting">
+        <span id="streak-label">Tarefas antes da recompensa</span>
+        <div class="stepper" role="group" aria-labelledby="streak-label">
+          <button id="streak-minus" type="button" aria-label="Diminuir quantidade de tarefas">−</button>
+          <output id="streak-limit" aria-live="polite">3</output>
+          <button id="streak-plus" type="button" aria-label="Aumentar quantidade de tarefas">+</button>
+        </div>
+      </div>
       <div id="result" class="result" hidden aria-live="polite">
         <p id="result-type" class="result-type"></p>
         <strong id="result-text"></strong>

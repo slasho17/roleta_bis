@@ -42,6 +42,10 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .spin-button { min-width: 150px; font-size: 1.05rem; }
 .spin-rule { min-height: 1.3em; margin: 12px 0 0; color: var(--muted); font-size: .86rem; }
 .spin-rule.warning { color: var(--reward-light); }
+.streak-setting { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; color: var(--muted); font-size: .86rem; }
+.stepper { display: flex; align-items: center; gap: 4px; padding: 3px; border: 1px solid var(--border); border-radius: 11px; background: #0000004d; }
+.stepper button { width: 30px; height: 30px; padding: 0; border-radius: 8px; background: var(--surface-2); color: var(--text); }
+.stepper output { min-width: 28px; color: var(--text); text-align: center; font-variant-numeric: tabular-nums; font-weight: 800; }
 .secondary { background: var(--surface-2); border: 1px solid var(--border); }
 .reward-button { background: linear-gradient(135deg, #ff7b00, var(--reward)); color: #000; box-shadow: 0 8px 22px #ff94003d; }
 .result { max-width: 500px; margin: 22px auto 0; padding: 18px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-2); }

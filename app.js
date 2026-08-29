@@ -3,6 +3,8 @@
 
   const STORAGE_KEY = 'roleta_itens';
   const HISTORY_KEY = 'roleta_historico';
+  const STREAK_LIMIT_KEY = 'roleta_limite_tarefas';
+  const DEFAULT_STREAK_LIMIT = 3;
   const TAU = Math.PI * 2;
   const $ = (selector) => document.querySelector(selector);
   const canvas = $('#wheel');
@@ -12,7 +14,13 @@
   let rotation = 0;
   let spinning = false;
   let selectedId = null;
+  let streakLimit = loadStreakLimit();
   let history = loadHistory();
+
+  function loadStreakLimit() {
+    const saved = Math.floor(Number(localStorage.getItem(STREAK_LIMIT_KEY)));
+    return saved >= 1 ? saved : DEFAULT_STREAK_LIMIT;
+  }
 
   function todayKey() {
     const now = new Date();
@@ -41,7 +49,7 @@
       return {
         dia: saved.dia,
         ultimoTipo: ['tarefa', 'recompensa'].includes(saved?.ultimoTipo) ? saved.ultimoTipo : null,
-        tarefasSeguidas: Math.max(0, Math.min(3, Math.floor(Number(saved?.tarefasSeguidas) || 0)))
+        tarefasSeguidas: Math.max(0, Math.min(streakLimit, Math.floor(Number(saved?.tarefasSeguidas) || 0)))
       };
     } catch { return { dia: todayKey(), ultimoTipo: null, tarefasSeguidas: 0 }; }
   }
@@ -139,6 +147,8 @@
   function render() {
     renderList('tarefa', '#task-list', '#task-count'); renderList('recompensa', '#reward-list', '#reward-count');
     $('#item-count').textContent = `${items.length} ${items.length === 1 ? 'item' : 'itens'}`;
+    $('#streak-limit').textContent = streakLimit;
+    $('#streak-minus').disabled = streakLimit <= 1;
     drawWheel();
     const empty = wheelEntries.length === 0;
     const options = getSpinOptions();
@@ -173,17 +183,17 @@
         ? { eligible: tasks, message: 'A última foi uma recompensa: agora será sorteada uma tarefa.' }
         : { eligible: [], message: 'Adicione ou reative uma tarefa para evitar duas recompensas seguidas.' };
     }
-    if (history.tarefasSeguidas >= 3) {
+    if (history.tarefasSeguidas >= streakLimit) {
       return rewards.length
-        ? { eligible: rewards, message: 'Três tarefas concluíram a sequência: a próxima será uma recompensa.' }
-        : { eligible: [], message: 'Adicione ou reative uma recompensa para continuar após três tarefas.' };
+        ? { eligible: rewards, message: `${streakLimit} ${streakLimit === 1 ? 'tarefa concluída' : 'tarefas concluídas'}: a próxima será uma recompensa.` }
+        : { eligible: [], message: `Adicione ou reative uma recompensa para continuar após ${streakLimit} ${streakLimit === 1 ? 'tarefa' : 'tarefas'}.` };
     }
-    return { eligible: active, message: `${history.tarefasSeguidas}/3 tarefas desde a última recompensa.` };
+    return { eligible: active, message: `${history.tarefasSeguidas}/${streakLimit} tarefas desde a última recompensa.` };
   }
 
   function registerResult(item) {
     if (item.tipo === 'recompensa') history = { dia: todayKey(), ultimoTipo: 'recompensa', tarefasSeguidas: 0 };
-    else history = { dia: todayKey(), ultimoTipo: 'tarefa', tarefasSeguidas: Math.min(3, history.tarefasSeguidas + 1) };
+    else history = { dia: todayKey(), ultimoTipo: 'tarefa', tarefasSeguidas: Math.min(streakLimit, history.tarefasSeguidas + 1) };
     saveHistory();
   }
 
@@ -227,6 +237,14 @@
   $('#reward-form').addEventListener('submit', event => { event.preventDefault(); if (addItems($('#reward-input').value, 'recompensa')) $('#reward-input').value = ''; });
   $('#task-list').addEventListener('click', handleListAction); $('#reward-list').addEventListener('click', handleListAction);
   $('#spin').addEventListener('click', spin); $('#spin-again').addEventListener('click', spin);
+  function changeStreakLimit(change) {
+    streakLimit = Math.max(1, streakLimit + change);
+    localStorage.setItem(STREAK_LIMIT_KEY, String(streakLimit));
+    history.tarefasSeguidas = Math.min(streakLimit, history.tarefasSeguidas);
+    saveHistory(); render();
+  }
+  $('#streak-minus').addEventListener('click', () => changeStreakLimit(-1));
+  $('#streak-plus').addEventListener('click', () => changeStreakLimit(1));
   $('#complete-result').addEventListener('click', () => { const item = items.find(i => i.id === selectedId); if (item) { item.concluido = true; save(); hideResult(); render(); } });
   render();
 })();
